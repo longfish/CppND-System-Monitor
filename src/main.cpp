@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include "linux_parser.h"
 #include "ncurses_display.h"
@@ -9,5 +10,5 @@ int main() {
   // NCursesDisplay::Display(system);
 
   // test
-  std::cout << LinuxParser::MemoryUtilization() << "\n";
+  // std::cout << LinuxParser::MemoryUtilization() << "\n";
 }
