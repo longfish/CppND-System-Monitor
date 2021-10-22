@@ -7,8 +7,12 @@
 
 int main() {
   System system;
-  // NCursesDisplay::Display(system);
+  NCursesDisplay::Display(system);
 
   // test
-  // std::cout << LinuxParser::MemoryUtilization() << "\n";
+  // std::cout << LinuxParser::Jiffies() << "\n";
+  // std::vector<long> cpu_stat = LinuxParser::CpuUtilization();
+  // for (auto ss : cpu_stat) {
+  //   std::cout << ss << "\n";
+  // }
 }
