@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <set>
 #include <string>
@@ -20,6 +21,9 @@ using std::vector;
 // TODO: Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
 
+// helper function for sorting processes
+bool Compare(Process& a, Process& b) { return a < b; }
+
 // TODO: Return a container composed of the system's processes
 vector<Process>& System::Processes() {
   vector<int> pids = LinuxParser::Pids();
@@ -28,6 +32,9 @@ vector<Process>& System::Processes() {
     proc.Pid(id);
     processes_.emplace_back(proc);
   }
+
+  // sort the processes based on cpu utilization
+  std::sort(processes_.begin(), processes_.end(), Compare);
   return processes_;
 }
 

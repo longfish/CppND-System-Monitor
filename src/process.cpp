@@ -19,7 +19,7 @@ int Process::Pid() { return id_; }
 
 // TODO: Return this process's CPU utilization
 // https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat
-float Process::CpuUtilization() {
+float Process::CpuUtilization() const {
   long active_time = LinuxParser::ActiveJiffies(id_) / sysconf(_SC_CLK_TCK);
   long elapsed_time = LinuxParser::UpTime() - UpTime();
   return (float)active_time / elapsed_time;
@@ -35,10 +35,10 @@ string Process::Ram() { return LinuxParser::Ram(id_); }
 string Process::User() { return LinuxParser::User(id_); }
 
 // TODO: Return the age of this process (in seconds)
-long int Process::UpTime() { return LinuxParser::UpTime(id_); }
+long int Process::UpTime() const { return LinuxParser::UpTime(id_); }
 
 // TODO: Overload the "less than" comparison operator for Process objects
 // REMOVE: [[maybe_unused]] once you define the function
-bool Process::operator<(Process const& a [[maybe_unused]]) const {
-  return true;
+bool Process::operator<(Process const& a) const {
+  return a.CpuUtilization() < CpuUtilization();
 }
