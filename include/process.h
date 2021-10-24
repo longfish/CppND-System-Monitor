@@ -22,7 +22,6 @@ class Process {
   // TODO: Declare any necessary private members
  private:
   int id_{};
-  std::vector<std::string> CpuStat();  // helper function
 };
 
 #endif

@@ -3,9 +3,11 @@
 #include <dirent.h>
 #include <unistd.h>
 
+#include <locale>
 #include <string>
 #include <vector>
 
+using std::locale;
 using std::stof;
 using std::string;
 using std::to_string;
@@ -114,7 +116,13 @@ long LinuxParser::Jiffies() {
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid [[maybe_unused]]) { return 0; }
+long LinuxParser::ActiveJiffies(int pid) {
+  vector<string> stat_values = CpuStat(pid);
+  long active = stol(stat_values[13]) + stol(stat_values[14]) +
+                stol(stat_values[15]) + stol(stat_values[16]);
+
+  return active;
+}
 
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() {
@@ -190,22 +198,113 @@ int LinuxParser::RunningProcesses() {
   return n_proc_running;
 }
 
+// helper struct for seperate input stream using colon
+struct colon_is_space : std::ctype<char> {
+  colon_is_space() : std::ctype<char>(get_table()) {}
+  static mask const* get_table() {
+    static mask rc[table_size];
+    rc[':'] = std::ctype_base::space;
+    rc['\n'] = std::ctype_base::space;
+    return &rc[0];
+  }
+};
+
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Command(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Command(int pid) {
+  string line;
+  std::ifstream filestream(LinuxParser::kProcDirectory + to_string(pid) +
+                           LinuxParser::kCmdlineFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+  }
+  return line;
+}
 
 // TODO: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Ram(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Ram(int pid) {
+  string line, key, value, ram;
+  std::ifstream filestream(LinuxParser::kProcDirectory + to_string(pid) +
+                           LinuxParser::kStatusFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      while (linestream >> key >> value) {
+        if (key == "VmSize:") {
+          ram = to_string(stol(value) /
+                          1000);  // convert from kb to mb in decimal
+        }
+      }
+    }
+  }
+  return ram;
+}
 
 // TODO: Read and return the user ID associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Uid(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Uid(int pid) {
+  string key, line, uid, value;
+  std::ifstream filestream(LinuxParser::kProcDirectory + to_string(pid) +
+                           LinuxParser::kStatusFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      while (linestream >> key >> value) {
+        if (key == "Uid:") {
+          uid = value;
+        }
+      }
+    }
+  }
+  return uid;
+}
 
 // TODO: Read and return the user associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::User(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::User(int pid) {
+  // refer to Robᵩ answer:
+  // https://stackoverflow.com/questions/7302996/changing-the-delimiter-for-cin-c
+  string key, line, value, uname, x;
+  string uid = Uid(pid);
+  std::ifstream filestream(LinuxParser::kPasswordPath);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      linestream.imbue(locale(linestream.getloc(), new colon_is_space));
+
+      while (linestream >> key >> x >> value) {
+        if (value == uid) {
+          uname = key;
+        }
+      }
+    }
+  }
+  return uname;
+}
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid [[maybe_unused]]) { return 0; }
+long LinuxParser::UpTime(int pid) {
+  vector<string> stat_values = CpuStat(pid);
+  long int age =
+      stol(stat_values[21]) / sysconf(_SC_CLK_TCK);  // up time of the process
+
+  return age;
+}
+
+// Helper function: get the CPU stat values read from /proc/[pid]/stat
+vector<string> LinuxParser::CpuStat(int pid) {
+  vector<string> stat_values{};
+  string line, value;
+  std::ifstream filestream(LinuxParser::kProcDirectory + to_string(pid) +
+                           LinuxParser::kStatFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    while (getline(linestream, value, ' ')) {
+      stat_values.emplace_back(value);
+    }
+  }
+  return stat_values;
+}

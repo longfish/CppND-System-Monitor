@@ -8,7 +8,7 @@
 
 int main() {
   System system;
-  // NCursesDisplay::Display(system);
+  NCursesDisplay::Display(system);
 
   // test
   // std::cout << LinuxParser::UpTime() << "\n";
@@ -17,7 +17,7 @@ int main() {
   // for (auto ss : cpu_stat) {
   //   std::cout << ss << "\n";
   // }
-  Process proc;
-  proc.Pid(115);
-  std::cout << proc.Ram() << "\n";
+  // Process proc;
+  // proc.Pid(115);
+  // std::cout << proc.Ram() << "\n";
 }
