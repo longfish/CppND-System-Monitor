@@ -2,6 +2,8 @@
 #define PROCESS_H
 
 #include <string>
+#include <vector>
+
 /*
 Basic class for Process representation
 It contains relevant attributes as shown below
@@ -20,6 +22,7 @@ class Process {
   // TODO: Declare any necessary private members
  private:
   int id_{};
+  std::vector<std::string> CpuStat();  // helper function
 };
 
 #endif

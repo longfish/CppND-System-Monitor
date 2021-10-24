@@ -85,8 +85,30 @@ string Process::User() {
   return uname;
 }
 
+// Helper function: get the CPU stat values read from /proc/[pid]/stat
+vector<string> Process::CpuStat() {
+  vector<string> stat_values{};
+  string line, value;
+  std::ifstream filestream(LinuxParser::kProcDirectory + to_string(id_) +
+                           LinuxParser::kStatFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    while (getline(linestream, value, ' ')) {
+      stat_values.emplace_back(value);
+    }
+  }
+  return stat_values;
+}
+
 // TODO: Return the age of this process (in seconds)
-long int Process::UpTime() { return 0; }
+long int Process::UpTime() {
+  vector<string> stat_values = CpuStat();
+  long int age =
+      stol(stat_values[21]) / sysconf(_SC_CLK_TCK);  // up time of the process
+
+  return age;
+}
 
 // TODO: Overload the "less than" comparison operator for Process objects
 // REMOVE: [[maybe_unused]] once you define the function

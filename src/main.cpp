@@ -19,5 +19,5 @@ int main() {
   // }
   Process proc;
   proc.Pid(115);
-  std::cout << proc.Command() << "\n";
+  std::cout << proc.UpTime() << "\n";
 }
