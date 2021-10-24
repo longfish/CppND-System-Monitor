@@ -35,7 +35,23 @@ string Process::Command() {
 }
 
 // TODO: Return this process's memory utilization
-string Process::Ram() { return string(); }
+string Process::Ram() {
+  string line, key, value, ram;
+  std::ifstream filestream(LinuxParser::kProcDirectory + to_string(id_) +
+                           LinuxParser::kStatusFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      while (linestream >> key >> value) {
+        if (key == "VmSize:") {
+          ram = to_string(stol(value) /
+                          1000);  // convert from kb to mb in decimal
+        }
+      }
+    }
+  }
+  return ram;
+}
 
 // helper struct for seperate input stream using colon
 struct colon_is_space : std::ctype<char> {
