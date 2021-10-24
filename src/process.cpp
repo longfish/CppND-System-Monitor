@@ -24,7 +24,15 @@ int Process::Pid() { return id_; }
 float Process::CpuUtilization() { return 0; }
 
 // TODO: Return the command that generated this process
-string Process::Command() { return string(); }
+string Process::Command() {
+  string line;
+  std::ifstream filestream(LinuxParser::kProcDirectory + to_string(id_) +
+                           LinuxParser::kCmdlineFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+  }
+  return line;
+}
 
 // TODO: Return this process's memory utilization
 string Process::Ram() { return string(); }

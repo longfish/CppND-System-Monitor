@@ -18,6 +18,6 @@ int main() {
   //   std::cout << ss << "\n";
   // }
   Process proc;
-  proc.Pid(118);
-  std::cout << proc.User() << "\n";
+  proc.Pid(115);
+  std::cout << proc.Command() << "\n";
 }

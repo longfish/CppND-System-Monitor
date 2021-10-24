@@ -1,10 +1,10 @@
 #include "processor.h"
 
-#include <unistd.h>  // since this is a linux program
+#include <unistd.h>  // since this is a linux program, use this header file for the sleep() function
 
 #include "linux_parser.h"
 
-// TODO: Return the aggregate CPU utilization
+// TODO: Return the aggregate CPU utilization (recent)
 float Processor::Utilization() {
   float prev_active = (float)LinuxParser::ActiveJiffies(),
         prev_total = (float)LinuxParser::Jiffies();
