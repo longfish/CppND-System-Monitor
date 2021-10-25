@@ -4,7 +4,7 @@
 
 #include "linux_parser.h"
 
-// TODO: Return the aggregate CPU utilization (recent)
+// Return the aggregate CPU utilization (recent)
 float Processor::Utilization() {
   float prev_active = (float)LinuxParser::ActiveJiffies(),
         prev_total = (float)LinuxParser::Jiffies();
