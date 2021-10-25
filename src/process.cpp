@@ -9,10 +9,7 @@
 #include <vector>
 
 #include "linux_parser.h"
-
-using std::string;
-using std::to_string;
-using std::vector;
+using namespace std;
 
 // Return this process's ID
 int Process::Pid() { return id_; }
@@ -23,11 +20,19 @@ int Process::Pid() { return id_; }
 float Process::CpuUtilization() const {
   long active_time = LinuxParser::ActiveJiffies(id_) / sysconf(_SC_CLK_TCK);
   long elapsed_time = LinuxParser::UpTime() - UpTime();
-  return (float)active_time / elapsed_time;
+  return static_cast<float>(active_time) / elapsed_time;
 }
 
-// Return the command that generated this process
-string Process::Command() { return LinuxParser::Command(id_); }
+// Return the command that generated this process (command length <= 50)
+string Process::Command() {
+  string command = LinuxParser::Command(id_);
+  string commandCut = command.substr(0, 50);
+
+  if (command.length() > 50) {
+    commandCut = commandCut + "...";
+  }
+  return commandCut;
+}
 
 // Return this process's memory utilization
 string Process::Ram() { return LinuxParser::Ram(id_); }

@@ -13,10 +13,7 @@
 #include "processor.h"
 
 using namespace LinuxParser;
-using std::set;
-using std::size_t;
-using std::string;
-using std::vector;
+using namespace std;
 
 // Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
@@ -28,25 +25,24 @@ bool Compare(Process& a, Process& b) { return a < b; }
 vector<Process>& System::Processes() {
   processes_.clear();
   vector<int> pids = LinuxParser::Pids();
-  for (int id : pids) {
-    Process proc;
-    proc.Pid(id);
-    processes_.emplace_back(proc);
+  for (auto pid : pids) {
+    Process process(pid);
+    processes_.emplace_back(process);
   }
 
   // sort the processes based on cpu utilization (larger first)
-  std::sort(processes_.begin(), processes_.end(), Compare);
+  sort(processes_.begin(), processes_.end(), Compare);
   return processes_;
 }
 
 // Return the system's kernel identifier (string)
-std::string System::Kernel() { return LinuxParser::Kernel(); }
+string System::Kernel() { return LinuxParser::Kernel(); }
 
 // Return the system's memory utilization
 float System::MemoryUtilization() { return LinuxParser::MemoryUtilization(); }
 
 // Return the operating system name
-std::string System::OperatingSystem() { return LinuxParser::OperatingSystem(); }
+string System::OperatingSystem() { return LinuxParser::OperatingSystem(); }
 
 // Return the number of processes actively running on the system
 int System::RunningProcesses() { return LinuxParser::RunningProcesses(); }
